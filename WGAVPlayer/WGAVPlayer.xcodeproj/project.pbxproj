@@ -1,0 +1,351 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E7122EEB1F0DE29E00F732EA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E7122EEA1F0DE29E00F732EA /* main.m */; };
+		E7122EEE1F0DE29E00F732EA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E7122EED1F0DE29E00F732EA /* AppDelegate.m */; };
+		E7122EF11F0DE29E00F732EA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E7122EF01F0DE29E00F732EA /* ViewController.m */; };
+		E7122EF41F0DE29E00F732EA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E7122EF21F0DE29E00F732EA /* Main.storyboard */; };
+		E7122EF61F0DE29E00F732EA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E7122EF51F0DE29E00F732EA /* Assets.xcassets */; };
+		E7122EF91F0DE29E00F732EA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E7122EF71F0DE29E00F732EA /* LaunchScreen.storyboard */; };
+		E7122F031F0DE30B00F732EA /* WGCacheSupportUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = E7122F021F0DE30B00F732EA /* WGCacheSupportUtils.m */; };
+		E7122F091F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = E7122F081F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.m */; };
+		E7122F0C1F0E0AB100F732EA /* WGCacheLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = E7122F0B1F0E0AB100F732EA /* WGCacheLoader.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		E7122EE61F0DE29E00F732EA /* WGAVPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WGAVPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E7122EEA1F0DE29E00F732EA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		E7122EEC1F0DE29E00F732EA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		E7122EED1F0DE29E00F732EA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		E7122EEF1F0DE29E00F732EA /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		E7122EF01F0DE29E00F732EA /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		E7122EF31F0DE29E00F732EA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		E7122EF51F0DE29E00F732EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E7122EF81F0DE29E00F732EA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E7122EFA1F0DE29E00F732EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E7122F011F0DE30B00F732EA /* WGCacheSupportUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WGCacheSupportUtils.h; sourceTree = "<group>"; };
+		E7122F021F0DE30B00F732EA /* WGCacheSupportUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WGCacheSupportUtils.m; sourceTree = "<group>"; };
+		E7122F071F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AVPlayerItem+WGCacheSupport.h"; sourceTree = "<group>"; };
+		E7122F081F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AVPlayerItem+WGCacheSupport.m"; sourceTree = "<group>"; };
+		E7122F0A1F0E0AB100F732EA /* WGCacheLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WGCacheLoader.h; sourceTree = "<group>"; };
+		E7122F0B1F0E0AB100F732EA /* WGCacheLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WGCacheLoader.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E7122EE31F0DE29E00F732EA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E7122EDD1F0DE29D00F732EA = {
+			isa = PBXGroup;
+			children = (
+				E7122EE81F0DE29E00F732EA /* WGAVPlayer */,
+				E7122EE71F0DE29E00F732EA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E7122EE71F0DE29E00F732EA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E7122EE61F0DE29E00F732EA /* WGAVPlayer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E7122EE81F0DE29E00F732EA /* WGAVPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				E7122F001F0DE2FD00F732EA /* WGAVPlayerSupport */,
+				E7122EEC1F0DE29E00F732EA /* AppDelegate.h */,
+				E7122EED1F0DE29E00F732EA /* AppDelegate.m */,
+				E7122EEF1F0DE29E00F732EA /* ViewController.h */,
+				E7122EF01F0DE29E00F732EA /* ViewController.m */,
+				E7122EF21F0DE29E00F732EA /* Main.storyboard */,
+				E7122EF51F0DE29E00F732EA /* Assets.xcassets */,
+				E7122EF71F0DE29E00F732EA /* LaunchScreen.storyboard */,
+				E7122EFA1F0DE29E00F732EA /* Info.plist */,
+				E7122EE91F0DE29E00F732EA /* Supporting Files */,
+			);
+			path = WGAVPlayer;
+			sourceTree = "<group>";
+		};
+		E7122EE91F0DE29E00F732EA /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E7122EEA1F0DE29E00F732EA /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E7122F001F0DE2FD00F732EA /* WGAVPlayerSupport */ = {
+			isa = PBXGroup;
+			children = (
+				E7122F011F0DE30B00F732EA /* WGCacheSupportUtils.h */,
+				E7122F021F0DE30B00F732EA /* WGCacheSupportUtils.m */,
+				E7122F071F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.h */,
+				E7122F081F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.m */,
+				E7122F0A1F0E0AB100F732EA /* WGCacheLoader.h */,
+				E7122F0B1F0E0AB100F732EA /* WGCacheLoader.m */,
+			);
+			path = WGAVPlayerSupport;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E7122EE51F0DE29E00F732EA /* WGAVPlayer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E7122EFD1F0DE29E00F732EA /* Build configuration list for PBXNativeTarget "WGAVPlayer" */;
+			buildPhases = (
+				E7122EE21F0DE29E00F732EA /* Sources */,
+				E7122EE31F0DE29E00F732EA /* Frameworks */,
+				E7122EE41F0DE29E00F732EA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WGAVPlayer;
+			productName = WGAVPlayer;
+			productReference = E7122EE61F0DE29E00F732EA /* WGAVPlayer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E7122EDE1F0DE29D00F732EA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = Xiaomi;
+				TargetAttributes = {
+					E7122EE51F0DE29E00F732EA = {
+						CreatedOnToolsVersion = 8.3.3;
+						DevelopmentTeam = X8279868NQ;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = E7122EE11F0DE29D00F732EA /* Build configuration list for PBXProject "WGAVPlayer" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E7122EDD1F0DE29D00F732EA;
+			productRefGroup = E7122EE71F0DE29E00F732EA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E7122EE51F0DE29E00F732EA /* WGAVPlayer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E7122EE41F0DE29E00F732EA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7122EF91F0DE29E00F732EA /* LaunchScreen.storyboard in Resources */,
+				E7122EF61F0DE29E00F732EA /* Assets.xcassets in Resources */,
+				E7122EF41F0DE29E00F732EA /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E7122EE21F0DE29E00F732EA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7122F031F0DE30B00F732EA /* WGCacheSupportUtils.m in Sources */,
+				E7122F0C1F0E0AB100F732EA /* WGCacheLoader.m in Sources */,
+				E7122EF11F0DE29E00F732EA /* ViewController.m in Sources */,
+				E7122F091F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.m in Sources */,
+				E7122EEE1F0DE29E00F732EA /* AppDelegate.m in Sources */,
+				E7122EEB1F0DE29E00F732EA /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		E7122EF21F0DE29E00F732EA /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E7122EF31F0DE29E00F732EA /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		E7122EF71F0DE29E00F732EA /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E7122EF81F0DE29E00F732EA /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		E7122EFB1F0DE29E00F732EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_ACTIVITY_MODE = "";
+				"DEBUG_ACTIVITY_MODE[arch=*]" = disable;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		E7122EFC1F0DE29E00F732EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_ACTIVITY_MODE = "";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E7122EFE1F0DE29E00F732EA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = X8279868NQ;
+				INFOPLIST_FILE = WGAVPlayer/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.xiaomi.WGAVPlayer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		E7122EFF1F0DE29E00F732EA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = X8279868NQ;
+				INFOPLIST_FILE = WGAVPlayer/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.xiaomi.WGAVPlayer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E7122EE11F0DE29D00F732EA /* Build configuration list for PBXProject "WGAVPlayer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E7122EFB1F0DE29E00F732EA /* Debug */,
+				E7122EFC1F0DE29E00F732EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E7122EFD1F0DE29E00F732EA /* Build configuration list for PBXNativeTarget "WGAVPlayer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E7122EFE1F0DE29E00F732EA /* Debug */,
+				E7122EFF1F0DE29E00F732EA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E7122EDE1F0DE29D00F732EA /* Project object */;
+}

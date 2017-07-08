@@ -13,6 +13,8 @@
 
 + (AVPlayerItem *)wg_playerItemWithURL:(NSURL *)URL;
 
++ (void)prepareLoadWithURL:(NSURL *)URL;
+
 + (void)removeVideoCache;
 
 @end

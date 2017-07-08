@@ -40,6 +40,13 @@
     return components.URL;
 }
 
++ (void)prepareLoadWithURL:(NSURL *)URL
+{
+    NSAssert(URL, @"嗯，你做的很不错，这都被你发现了，加油小伙子");
+    WGCacheLoader *loader = [[WGCacheLoader alloc] initWithURL:URL preload:YES];
+    NSAssert(loader, @"自己搞事情了。");
+}
+
 + (void)removeVideoCache
 {
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
@@ -58,9 +65,13 @@
     NSString *fileName;
     while (fileName = [enumerator nextObject]) {
         NSString *filePath = [WGCacheDocumentyDirectory() stringByAppendingPathComponent:fileName];
-        NSDate *date = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil].fileCreationDate;
+        NSDate *date = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil].fileModificationDate;
+        
         if ([[NSDate date] timeIntervalSinceDate:date] > 24 * 60 * 60) {
-            [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+            if ([[filePath pathExtension] isEqualToString:@"idx"]) {
+                [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+                [[NSFileManager defaultManager] removeItemAtPath:[[filePath componentsSeparatedByString:@"."] firstObject] error:nil];
+            }
         }
     }
 }

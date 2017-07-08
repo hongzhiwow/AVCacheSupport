@@ -17,6 +17,8 @@ static NSString *WGCacheSizeKey = @"size";
 const void *WGLoadingRequestKey = "wg_cache_loading_request_key";
 const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
 
+const NSRange WGPreloadRange = {0,100 * 1024};
+
 @interface WGCacheLoader () <NSURLSessionDataDelegate>
 
 @property (nonatomic, strong) NSDictionary *responseHeader;
@@ -37,7 +39,7 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
 
 @implementation WGCacheLoader
 
-#pragma mark - 
+#pragma mark -
 #pragma mark - life cycle
 - (instancetype)initWithURL:(NSURL *)URL preload:(BOOL)ispreload
 {
@@ -54,7 +56,11 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
         if (![self initFile]) {
             return nil;
         }
-
+        
+        if (ispreload) {
+            [self preloadWithRange:WGPreloadRange];
+        }
+        
     }
     return self;
 }
@@ -74,7 +80,7 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
     return _pendingRequest;
 }
 
-#pragma mark - 
+#pragma mark -
 #pragma mark - file
 - (BOOL)initFile
 {
@@ -124,6 +130,17 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
     }
 }
 
+- (NSDictionary *)readIndexFile
+{
+    NSString *indexString = [NSString stringWithContentsOfFile:_indexPath
+                                                      encoding:NSUTF8StringEncoding error:nil];
+    NSData *data = [indexString dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *map = [NSJSONSerialization JSONObjectWithData:data
+                                                        options:NSJSONReadingMutableContainers | NSJSONReadingAllowFragments
+                                                          error:nil];
+    return map;
+}
+
 
 - (BOOL)serializeIndex:(NSDictionary *)map
 {
@@ -142,7 +159,7 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
     {
         return NO;
     }
-
+    
     
     [self.ranges removeAllObjects];
     NSMutableArray *rangeArray = map[WGCacheZoneKey];
@@ -216,14 +233,39 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
 
 #pragma mark -
 #pragma mark - handle loadingRequest
+
+- (void)preloadWithRange:(NSRange)range
+{
+    NSDictionary *map = [self readIndexFile];
+    NSRange r = WGInvalidRange;
+    
+    if ([self serializeIndex:map]) {
+        r = [self cachedRangeForRange:range];
+        if (!WGValidByteRange(range)) {
+            r = range;
+            goto sendrequest;
+        }
+        goto checklocal;
+    } else {
+        r = range;
+        goto sendrequest;
+    }
+    
+sendrequest:
+    [self sendRemoteRequest:nil withRange:r];
+    return;
+    
+checklocal:
+    if (NSMaxRange(r) < NSMaxRange(range)) {
+        r = NSMakeRange(NSMaxRange(r), NSMaxRange(range) - NSMaxRange(r));
+        goto sendrequest;
+    }
+    
+}
+
 - (void)handleLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    NSString *indexString = [NSString stringWithContentsOfFile:_indexPath
-                                                      encoding:NSUTF8StringEncoding error:nil];
-    NSData *data = [indexString dataUsingEncoding:NSUTF8StringEncoding];
-    NSDictionary *map = [NSJSONSerialization JSONObjectWithData:data
-                                                        options:NSJSONReadingMutableContainers | NSJSONReadingAllowFragments
-                                                          error:nil];
+    NSDictionary *map = [self readIndexFile];
     NSRange range = WGInvalidRange;
     NSRange reqRange = NSMakeRange(loadingRequest.dataRequest.requestedOffset, loadingRequest.dataRequest.requestedLength);
     if ([self serializeIndex:map]) {
@@ -332,7 +374,7 @@ cachelocal:
                                                                 cachePolicy:NSURLRequestReloadIgnoringCacheData
                                                             timeoutInterval:20.f];
     NSRange requestRange = range;
-    if (!WGValidByteRange(range)) {
+    if (!WGValidByteRange(range) && loadingRequest) {
         requestRange = NSMakeRange(loadingRequest.dataRequest.requestedOffset, loadingRequest.dataRequest.requestedLength);
     }
     [request setValue:WGRangeToHTTPRangeHeader(requestRange) forHTTPHeaderField:@"Range"];
@@ -357,7 +399,7 @@ cachelocal:
     }
 }
 
-#pragma mark - 
+#pragma mark -
 #pragma mark - NSURLSessionDataDelegate
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
 didReceiveResponse:(NSURLResponse *)response
@@ -373,7 +415,7 @@ didReceiveResponse:(NSURLResponse *)response
         self.fileHandle = [NSFileHandle fileHandleForWritingAtPath:self.cachePath];
         [self.fileHandle truncateFileAtOffset:_fileLength];
         completionHandler(NSURLSessionResponseAllow);
-
+        
     } else {
         completionHandler(NSURLSessionResponseCancel);
     }
@@ -393,7 +435,7 @@ didReceiveResponse:(NSURLResponse *)response
     
     [self.fileHandle seekToFileOffset:offset];
     [self addRange:NSMakeRange(offset, [currentData length])];
-
+    
     offset += currentData.length;
     [self.fileHandle writeData:currentData];
     [self.fileHandle synchronizeFile];

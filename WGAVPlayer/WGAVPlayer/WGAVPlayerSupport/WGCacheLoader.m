@@ -454,6 +454,8 @@ didReceiveResponse:(NSURLResponse *)response
         [loadingRequest finishLoading];
         [session finishTasksAndInvalidate];
     }
+    [self.pendingRequest removeObject:task];
+
 }
 
 

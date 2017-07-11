@@ -55,7 +55,7 @@ const NSRange WGPreloadRange = {0,100 * 1024};
         _currentURL = URL;
         _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
                                                  delegate:self
-                                            delegateQueue:self.workQueue];
+                                            delegateQueue:_workQueue];
         
         if (![self initFile]) {
             return nil;

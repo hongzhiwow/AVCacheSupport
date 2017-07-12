@@ -26,7 +26,6 @@ const NSRange WGPreloadRange = {0,100 * 1024};
 @property (nonatomic, assign) NSUInteger fileLength;
 @property (nonatomic, strong) NSFileHandle *fileHandle;
 
-@property (nonatomic, strong) NSURLSession *session;
 @property (nonatomic, strong) NSOperationQueue *workQueue;
 @property (nonatomic, strong) NSURL *currentURL;
 @property (nonatomic, strong) NSMutableArray *pendingRequest;
@@ -53,9 +52,6 @@ const NSRange WGPreloadRange = {0,100 * 1024};
         _workQueue = [[NSOperationQueue alloc] init];
         _workQueue.underlyingQueue = _underlyingQueue;
         _currentURL = URL;
-        _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
-                                                 delegate:self
-                                            delegateQueue:_workQueue];
         
         if (![self initFile]) {
             return nil;
@@ -383,7 +379,11 @@ cachelocal:
     }
     [request setValue:WGRangeToHTTPRangeHeader(requestRange) forHTTPHeaderField:@"Range"];
     
-    NSURLSessionTask *dataTask = [self.session dataTaskWithRequest:request];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                          delegate:self
+                                                     delegateQueue:_workQueue];
+    
+    NSURLSessionTask *dataTask = [session dataTaskWithRequest:request];
     objc_setAssociatedObject(dataTask, WGLoadingRequestKey, loadingRequest, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     NSUInteger offset = requestRange.location;
     objc_setAssociatedObject(dataTask, WGTaskOffsetKey, @(offset), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -444,7 +444,6 @@ didReceiveResponse:(NSURLResponse *)response
     [self.fileHandle synchronizeFile];
     [self synchronizeIndexFile];
     objc_setAssociatedObject(dataTask, WGTaskOffsetKey, @(offset), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    
 }
 
 -(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
@@ -452,17 +451,19 @@ didReceiveResponse:(NSURLResponse *)response
     AVAssetResourceLoadingRequest *loadingRequest = objc_getAssociatedObject((NSURLSessionDataTask *)task, WGLoadingRequestKey);
     if (error) {
         [loadingRequest finishLoadingWithError:error];
+        [session invalidateAndCancel];
     } else {
         [loadingRequest finishLoading];
+        [session finishTasksAndInvalidate];
+        
     }
     [self.pendingRequest removeObject:task];
-
+    
 }
 
 - (void)dealloc
 {
     [self.fileHandle closeFile];
-    [self.session finishTasksAndInvalidate];
 }
 
 

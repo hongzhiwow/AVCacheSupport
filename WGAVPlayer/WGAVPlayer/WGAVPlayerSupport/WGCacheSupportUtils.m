@@ -12,7 +12,7 @@
 @import MobileCoreServices;
 
 static NSString *const kAVPlayerItemWGCacheSupportUrlSchemeSuffix = @"-stream";
-NSString *const WGCacheSubDirectoryName = @"AVPlayerWGCache";
+NSString *const WGCacheSubDirectoryName = @"PlayerCache";
 const NSRange WGInvalidRange = {NSNotFound,0};
 
 @implementation NSString (WGCacheSupport)

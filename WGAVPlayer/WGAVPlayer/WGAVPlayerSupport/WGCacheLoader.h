@@ -12,6 +12,10 @@
 @interface WGCacheLoader : NSObject <AVAssetResourceLoaderDelegate>
 
 @property (nonatomic, strong, readonly) dispatch_queue_t underlyingQueue;
+@property (nonatomic, assign, getter=isSuspend) BOOL suspend;
 
-- (instancetype)initWithURL:(NSURL *)URL preload:(BOOL)ispreload;
+- (instancetype)initWithURL:(NSURL *)URL;
+
+- (void)cancelLoader;
+
 @end

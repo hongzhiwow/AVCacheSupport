@@ -22,12 +22,24 @@
 
 + (AVPlayerItem *)wg_playerItemWithURL:(NSURL *)URL
 {
-    WGCacheLoader *loader = [[WGCacheLoader alloc] initWithURL:URL preload:NO];
+    WGCacheLoader *loader = [[WGCacheLoader alloc] initWithURL:URL];
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:[self valideURL:URL]  options:nil];
     [asset.resourceLoader setDelegate:loader queue:loader.underlyingQueue];
     AVPlayerItem *item = [AVPlayerItem playerItemWithAsset:asset];
     objc_setAssociatedObject(item, @selector(wg_playerItemWithURL:), loader, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     return item;
+}
+
+- (void)cancelPendings
+{
+    WGCacheLoader *loader = objc_getAssociatedObject(self, @selector(wg_playerItemWithURL:));
+    [loader cancelLoader];
+}
+
+- (void)setSuspend:(BOOL)suspend
+{
+    WGCacheLoader *loader = objc_getAssociatedObject(self, @selector(wg_playerItemWithURL:));
+    [loader setSuspend:suspend];
 }
 
 + (NSURL *)valideURL:(NSURL *)URL
@@ -38,13 +50,6 @@
     NSURLComponents *components = [NSURLComponents componentsWithURL:URL resolvingAgainstBaseURL:NO];
     components.scheme = @"stream";
     return components.URL;
-}
-
-+ (void)prepareLoadWithURL:(NSURL *)URL
-{
-    NSAssert(URL, @"嗯，你做的很不错，这都被你发现了，加油小伙子");
-    WGCacheLoader *loader = [[WGCacheLoader alloc] initWithURL:URL preload:YES];
-    NSAssert(loader, @"自己搞事情了。");
 }
 
 + (void)removeVideoCache

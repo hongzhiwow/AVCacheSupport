@@ -13,7 +13,12 @@
 
 + (AVPlayerItem *)wg_playerItemWithURL:(NSURL *)URL;
 
-+ (void)prepareLoadWithURL:(NSURL *)URL;
+/**
+ 播放器释放之前必须调用
+ */
+- (void)cancelPendings;
+
+- (void)setSuspend:(BOOL)suspend;
 
 + (void)removeVideoCache;
 

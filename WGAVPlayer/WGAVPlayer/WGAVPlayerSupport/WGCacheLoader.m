@@ -17,14 +17,17 @@ static NSString *WGCacheSizeKey = @"size";
 const void *WGLoadingRequestKey = "wg_cache_loading_request_key";
 const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
 
-const NSRange WGPreloadRange = {0,100 * 1024};
-
 @interface WGCacheLoader () <NSURLSessionDataDelegate>
+{
+    @private
+    NSURLSession *_session;
+}
 
 @property (nonatomic, strong) NSDictionary *responseHeader;
 @property (nonatomic, strong) NSMutableArray *ranges;
 @property (nonatomic, assign) NSUInteger fileLength;
 @property (nonatomic, strong) NSFileHandle *fileHandle;
+@property (nonatomic, strong) NSFileHandle *indexHandle;
 
 @property (nonatomic, strong) NSOperationQueue *workQueue;
 @property (nonatomic, strong) NSURL *currentURL;
@@ -41,7 +44,7 @@ const NSRange WGPreloadRange = {0,100 * 1024};
 
 #pragma mark -
 #pragma mark - life cycle
-- (instancetype)initWithURL:(NSURL *)URL preload:(BOOL)ispreload
+- (instancetype)initWithURL:(NSURL *)URL
 {
     if ([URL isFileURL]) {
         return nil;
@@ -53,17 +56,36 @@ const NSRange WGPreloadRange = {0,100 * 1024};
         _workQueue.underlyingQueue = _underlyingQueue;
         _currentURL = URL;
         
+        _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                 delegate:self
+                                            delegateQueue:self.workQueue];
+        
         if (![self initFile]) {
             return nil;
         }
         
-        if (ispreload) {
-            [self preloadWithRange:WGPreloadRange];
-        }
-        
+        _indexHandle = [NSFileHandle fileHandleForWritingAtPath:_indexPath];
     }
     return self;
 }
+
+- (void)cancelLoader
+{
+    [_session invalidateAndCancel];
+    _session = nil;
+    //等待写入操作完成释放
+    if (self.workQueue.isSuspended) {
+        [self.workQueue setSuspended:NO];
+    }
+    [self.workQueue waitUntilAllOperationsAreFinished];
+}
+
+- (void)setSuspend:(BOOL)suspend
+{
+    _suspend = suspend;
+    [self.workQueue setSuspended:suspend];
+}
+
 - (NSMutableArray *)ranges
 {
     if (!_ranges) {
@@ -132,9 +154,9 @@ const NSRange WGPreloadRange = {0,100 * 1024};
 
 - (NSDictionary *)readIndexFile
 {
-    NSString *indexString = [NSString stringWithContentsOfFile:_indexPath
-                                                      encoding:NSUTF8StringEncoding error:nil];
-    NSData *data = [indexString dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *data = [NSData dataWithContentsOfFile:_indexPath
+                                          options:NSDataReadingMappedIfSafe
+                                            error:nil];
     NSDictionary *map = [NSJSONSerialization JSONObjectWithData:data
                                                         options:NSJSONReadingMutableContainers | NSJSONReadingAllowFragments
                                                           error:nil];
@@ -177,7 +199,7 @@ const NSRange WGPreloadRange = {0,100 * 1024};
     return YES;
 }
 
-- (NSString *)unserializeIndex
+- (NSData *)unserializeIndex
 {
     NSMutableArray *rangeArray = [[NSMutableArray alloc] init];
     for (NSValue *range in self.ranges)
@@ -194,17 +216,14 @@ const NSRange WGPreloadRange = {0,100 * 1024};
     }
     
     NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-    if (data)
-    {
-        return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    }
-    return nil;
+    return data;
 }
 
 - (void)synchronizeIndexFile
 {
-    NSString *indexStr = [self unserializeIndex];
-    [indexStr writeToFile:_indexPath atomically:YES encoding:NSUTF8StringEncoding error:NULL];
+    [self.indexHandle truncateFileAtOffset:0];
+    [self.indexHandle writeData:[self unserializeIndex]];
+    [self.indexHandle synchronizeFile];
 }
 
 - (NSString *)indexFileExtension
@@ -230,38 +249,8 @@ const NSRange WGPreloadRange = {0,100 * 1024};
     }
 }
 
-
 #pragma mark -
 #pragma mark - handle loadingRequest
-
-- (void)preloadWithRange:(NSRange)range
-{
-    NSDictionary *map = [self readIndexFile];
-    NSRange r = WGInvalidRange;
-    
-    if ([self serializeIndex:map]) {
-        r = [self cachedRangeForRange:range];
-        if (!WGValidByteRange(range)) {
-            r = range;
-            goto sendrequest;
-        }
-        goto checklocal;
-    } else {
-        r = range;
-        goto sendrequest;
-    }
-    
-sendrequest:
-    [self sendRemoteRequest:nil withRange:r];
-    return;
-    
-checklocal:
-    if (NSMaxRange(r) < NSMaxRange(range)) {
-        r = NSMakeRange(NSMaxRange(r), NSMaxRange(range) - NSMaxRange(r));
-        goto sendrequest;
-    }
-    
-}
 
 - (void)handleLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
@@ -378,12 +367,11 @@ cachelocal:
         requestRange = NSMakeRange(loadingRequest.dataRequest.requestedOffset, loadingRequest.dataRequest.requestedLength);
     }
     [request setValue:WGRangeToHTTPRangeHeader(requestRange) forHTTPHeaderField:@"Range"];
-    
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
-                                                          delegate:self
-                                                     delegateQueue:_workQueue];
-    
-    NSURLSessionTask *dataTask = [session dataTaskWithRequest:request];
+    if (![_session.delegate isEqual:self] || !_session) {
+        return;
+    }
+
+    NSURLSessionTask *dataTask = [_session dataTaskWithRequest:request];
     objc_setAssociatedObject(dataTask, WGLoadingRequestKey, loadingRequest, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     NSUInteger offset = requestRange.location;
     objc_setAssociatedObject(dataTask, WGTaskOffsetKey, @(offset), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -427,7 +415,6 @@ didReceiveResponse:(NSURLResponse *)response
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
     didReceiveData:(NSData *)data
 {
-    
     AVAssetResourceLoadingRequest *loadingRequest = objc_getAssociatedObject(dataTask, WGLoadingRequestKey);
     NSUInteger offset = [objc_getAssociatedObject(dataTask, WGTaskOffsetKey) unsignedIntegerValue];
     NSMutableData *currentData = [NSMutableData data];
@@ -435,14 +422,13 @@ didReceiveResponse:(NSURLResponse *)response
         [currentData appendBytes:bytes length:byteRange.length];
     }];
     [loadingRequest.dataRequest respondWithData:currentData];
-    
     [self.fileHandle seekToFileOffset:offset];
     [self addRange:NSMakeRange(offset, [currentData length])];
     
     offset += currentData.length;
     [self.fileHandle writeData:currentData];
     [self.fileHandle synchronizeFile];
-    [self synchronizeIndexFile];
+
     objc_setAssociatedObject(dataTask, WGTaskOffsetKey, @(offset), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
@@ -451,19 +437,18 @@ didReceiveResponse:(NSURLResponse *)response
     AVAssetResourceLoadingRequest *loadingRequest = objc_getAssociatedObject((NSURLSessionDataTask *)task, WGLoadingRequestKey);
     if (error) {
         [loadingRequest finishLoadingWithError:error];
-        [session invalidateAndCancel];
     } else {
         [loadingRequest finishLoading];
-        [session finishTasksAndInvalidate];
-        
     }
-    [self.pendingRequest removeObject:task];
-    
+    [self.pendingRequest removeObject:task];    
 }
 
 - (void)dealloc
 {
+    [self synchronizeIndexFile];
     [self.fileHandle closeFile];
+    [self.indexHandle closeFile];
+
 }
 
 

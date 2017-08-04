@@ -16,6 +16,8 @@
 		E7122F031F0DE30B00F732EA /* WGCacheSupportUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = E7122F021F0DE30B00F732EA /* WGCacheSupportUtils.m */; };
 		E7122F091F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = E7122F081F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.m */; };
 		E7122F0C1F0E0AB100F732EA /* WGCacheLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = E7122F0B1F0E0AB100F732EA /* WGCacheLoader.m */; };
+		E7C4939D1F3416D100CC6423 /* WGDBManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E7C4939C1F3416D100CC6423 /* WGDBManager.m */; };
+		E7C493A01F343E8A00CC6423 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = E7C4939F1F343E8A00CC6423 /* libsqlite3.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +37,9 @@
 		E7122F081F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AVPlayerItem+WGCacheSupport.m"; sourceTree = "<group>"; };
 		E7122F0A1F0E0AB100F732EA /* WGCacheLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WGCacheLoader.h; sourceTree = "<group>"; };
 		E7122F0B1F0E0AB100F732EA /* WGCacheLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WGCacheLoader.m; sourceTree = "<group>"; };
+		E7C4939B1F3416D100CC6423 /* WGDBManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WGDBManager.h; sourceTree = "<group>"; };
+		E7C4939C1F3416D100CC6423 /* WGDBManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WGDBManager.m; sourceTree = "<group>"; };
+		E7C4939F1F343E8A00CC6423 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7C493A01F343E8A00CC6423 /* libsqlite3.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,6 +59,7 @@
 			children = (
 				E7122EE81F0DE29E00F732EA /* WGAVPlayer */,
 				E7122EE71F0DE29E00F732EA /* Products */,
+				E7C4939E1F343E8A00CC6423 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -98,8 +105,18 @@
 				E7122F081F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.m */,
 				E7122F0A1F0E0AB100F732EA /* WGCacheLoader.h */,
 				E7122F0B1F0E0AB100F732EA /* WGCacheLoader.m */,
+				E7C4939B1F3416D100CC6423 /* WGDBManager.h */,
+				E7C4939C1F3416D100CC6423 /* WGDBManager.m */,
 			);
 			path = WGAVPlayerSupport;
+			sourceTree = "<group>";
+		};
+		E7C4939E1F343E8A00CC6423 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E7C4939F1F343E8A00CC6423 /* libsqlite3.tbd */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -179,6 +196,7 @@
 				E7122EF11F0DE29E00F732EA /* ViewController.m in Sources */,
 				E7122F091F0DE40B00F732EA /* AVPlayerItem+WGCacheSupport.m in Sources */,
 				E7122EEE1F0DE29E00F732EA /* AppDelegate.m in Sources */,
+				E7C4939D1F3416D100CC6423 /* WGDBManager.m in Sources */,
 				E7122EEB1F0DE29E00F732EA /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

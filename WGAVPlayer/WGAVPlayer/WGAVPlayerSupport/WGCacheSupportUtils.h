@@ -75,7 +75,7 @@ NS_INLINE NSString* WGRangeToHTTPRangeReponseHeader(NSRange range,NSUInteger len
 
 NS_INLINE NSString *WGCacheDocumentyDirectory()
 {
-    NSArray *directories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSArray *directories = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     if (directories.count > 0)
     {
         return [[directories firstObject] stringByAppendingPathComponent:WGCacheSubDirectoryName];

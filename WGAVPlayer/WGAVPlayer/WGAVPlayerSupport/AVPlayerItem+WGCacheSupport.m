@@ -10,6 +10,7 @@
 #import "WGCacheLoader.h"
 #import <objc/runtime.h>
 #import "WGCacheSupportUtils.h"
+#import "WGDBManager.h"
 
 @implementation AVPlayerItem (WGCacheSupport)
 
@@ -59,6 +60,7 @@
         NSString *fileName;
         while (fileName = [enumerator nextObject]) {
             NSString *filePath = [WGCacheDocumentyDirectory() stringByAppendingPathComponent:fileName];
+            [[WGDBManager sharedManager] deleteDBWithKey:fileName];
             [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
         }
     });
@@ -73,10 +75,9 @@
         NSDate *date = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:nil].fileModificationDate;
         
         if ([[NSDate date] timeIntervalSinceDate:date] > 24 * 60 * 60) {
-            if ([[filePath pathExtension] isEqualToString:@"idx"]) {
-                [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-                [[NSFileManager defaultManager] removeItemAtPath:[[filePath componentsSeparatedByString:@"."] firstObject] error:nil];
-            }
+            NSString *filePath = [WGCacheDocumentyDirectory() stringByAppendingPathComponent:fileName];
+            [[WGDBManager sharedManager] deleteDBWithKey:fileName];
+            [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
         }
     }
 }

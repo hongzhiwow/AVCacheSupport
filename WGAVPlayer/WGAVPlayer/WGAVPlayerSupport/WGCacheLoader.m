@@ -8,6 +8,7 @@
 
 #import "WGCacheLoader.h"
 #import "WGCacheSupportUtils.h"
+#import "WGDBManager.h"
 #import <objc/runtime.h>
 
 static NSString *WGCacheHeaderKey = @"header";
@@ -27,7 +28,6 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
 @property (nonatomic, strong) NSMutableArray *ranges;
 @property (nonatomic, assign) NSUInteger fileLength;
 @property (nonatomic, strong) NSFileHandle *fileHandle;
-@property (nonatomic, strong) NSFileHandle *indexHandle;
 
 @property (nonatomic, strong) NSOperationQueue *workQueue;
 @property (nonatomic, strong) NSURL *currentURL;
@@ -35,7 +35,6 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
 
 @property (nonatomic, strong) NSHTTPURLResponse *response;
 @property (nonatomic, copy) NSString *cachePath;
-@property (nonatomic, copy) NSString *indexPath;
 
 
 @end
@@ -63,8 +62,6 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
         if (![self initFile]) {
             return nil;
         }
-        
-        _indexHandle = [NSFileHandle fileHandleForWritingAtPath:_indexPath];
     }
     return self;
 }
@@ -107,11 +104,11 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
 - (BOOL)initFile
 {
     _cachePath = [WGCacheDocumentyDirectory() stringByAppendingPathComponent:[self.currentURL.absoluteString md5]];
-    _indexPath = [_cachePath stringByAppendingString:[self indexFileExtension]];
     BOOL cacheFileExist = [[NSFileManager defaultManager] fileExistsAtPath:_cachePath];
-    BOOL indexFileExist = [[NSFileManager defaultManager] fileExistsAtPath:_indexPath];
+    NSDictionary *index =  [[WGDBManager sharedManager] selectDBWithURL:self.currentURL];
+    BOOL indexExit = index && index.count;
     
-    BOOL fileExist = cacheFileExist && indexFileExist;
+    BOOL fileExist = cacheFileExist && indexExit;
     if (!fileExist)
     {
         NSString *directory = [_cachePath stringByDeletingLastPathComponent];
@@ -120,7 +117,7 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
             [[NSFileManager defaultManager] createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:nil];
         }
         fileExist = [[NSFileManager defaultManager] createFileAtPath:_cachePath contents:nil attributes:nil];
-        fileExist = fileExist && [[NSFileManager defaultManager] createFileAtPath:_indexPath contents:nil attributes:nil];
+        fileExist = fileExist && [[WGDBManager sharedManager] insertDBWithURL:self.currentURL value:@""];
     }
     return fileExist;
 }
@@ -152,15 +149,10 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
     }
 }
 
-- (NSDictionary *)readIndexFile
+- (NSDictionary *)readIndex
 {
-    NSData *data = [NSData dataWithContentsOfFile:_indexPath
-                                          options:NSDataReadingMappedIfSafe
-                                            error:nil];
-    NSDictionary *map = [NSJSONSerialization JSONObjectWithData:data
-                                                        options:NSJSONReadingMutableContainers | NSJSONReadingAllowFragments
-                                                          error:nil];
-    return map;
+    NSDictionary *index = [[WGDBManager sharedManager] selectDBWithURL:self.currentURL];
+    return [WGDBManager getMapFromString:index[kValue]];
 }
 
 
@@ -182,7 +174,6 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
         return NO;
     }
     
-    
     [self.ranges removeAllObjects];
     NSMutableArray *rangeArray = map[WGCacheZoneKey];
     if (!rangeArray.count) {
@@ -199,7 +190,7 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
     return YES;
 }
 
-- (NSData *)unserializeIndex
+- (NSString *)unserializeIndex
 {
     NSMutableArray *rangeArray = [[NSMutableArray alloc] init];
     for (NSValue *range in self.ranges)
@@ -215,20 +206,12 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
         dict[WGCacheHeaderKey] = self.responseHeader;
     }
     
-    NSData *data = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
-    return data;
+    return [WGDBManager stringFormDictionary:dict];
 }
 
 - (void)synchronizeIndexFile
 {
-    [self.indexHandle truncateFileAtOffset:0];
-    [self.indexHandle writeData:[self unserializeIndex]];
-    [self.indexHandle synchronizeFile];
-}
-
-- (NSString *)indexFileExtension
-{
-    return @".idx";
+    [[WGDBManager sharedManager] updateDBWithURL:self.currentURL value:[self unserializeIndex]];
 }
 
 #pragma mark -
@@ -254,7 +237,7 @@ const void *WGTaskOffsetKey = "wg_cache_loading_offset_key";
 
 - (void)handleLoadingRequest:(AVAssetResourceLoadingRequest *)loadingRequest
 {
-    NSDictionary *map = [self readIndexFile];
+    NSDictionary *map = [self readIndex];
     NSRange range = WGInvalidRange;
     NSRange reqRange = NSMakeRange(loadingRequest.dataRequest.requestedOffset, loadingRequest.dataRequest.requestedLength);
     if ([self serializeIndex:map]) {
@@ -404,8 +387,13 @@ didReceiveResponse:(NSURLResponse *)response
         self.responseHeader = [[httpResponse allHeaderFields] copy];
         _fileLength = httpResponse.fileLength;
         self.fileHandle = [NSFileHandle fileHandleForWritingAtPath:self.cachePath];
-        [self.fileHandle truncateFileAtOffset:_fileLength];
-        completionHandler(NSURLSessionResponseAllow);
+        @try {
+            [self.fileHandle truncateFileAtOffset:_fileLength];
+        } @catch (NSException *exception) {
+            //
+        } @finally {
+            completionHandler(NSURLSessionResponseAllow);
+        }
         
     } else {
         completionHandler(NSURLSessionResponseCancel);
@@ -428,6 +416,7 @@ didReceiveResponse:(NSURLResponse *)response
     offset += currentData.length;
     [self.fileHandle writeData:currentData];
     [self.fileHandle synchronizeFile];
+    [self synchronizeIndexFile];
 
     objc_setAssociatedObject(dataTask, WGTaskOffsetKey, @(offset), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
@@ -447,8 +436,6 @@ didReceiveResponse:(NSURLResponse *)response
 {
     [self synchronizeIndexFile];
     [self.fileHandle closeFile];
-    [self.indexHandle closeFile];
-
 }
 
 

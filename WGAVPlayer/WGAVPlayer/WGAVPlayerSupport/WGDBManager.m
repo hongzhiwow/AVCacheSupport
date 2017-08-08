@@ -9,6 +9,7 @@
 #import "WGDBManager.h"
 #import "WGCacheSupportUtils.h"
 #import <sqlite3.h>
+//#import <pthread.h>
 
 static NSString *const kDBName = @"vc.sqlite";
 
@@ -19,6 +20,7 @@ NSString *const kValue = @"value";
 {
     @private
     sqlite3 *_db;
+//    pthread_mutex_t _mutex;
     dispatch_semaphore_t _semaphore;
     NSString *_dbPath;
 }
@@ -71,29 +73,37 @@ NSString *const kValue = @"value";
 
 - (BOOL)insertDBWithURL:(NSURL *)URL value:(NSString *)value
 {
-    dispatch_semaphore_signal(_semaphore);
+//    pthread_mutex_lock(&_mutex);
+    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
     NSString *SQLString = [NSString stringWithFormat:@"INSERT INTO CACHEINDEX (key,value) VALUES ('%@','%@')",URL.absoluteString.md5,value];
     char *error;
     BOOL ret = sqlite3_exec(_db, SQLString.UTF8String, NULL, NULL, &error) == SQLITE_OK;
-    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
+//    pthread_mutex_unlock(&_mutex);
+    dispatch_semaphore_signal(_semaphore);
     return ret;
 }
 
 - (BOOL)updateDBWithURL:(NSURL *)URL value:(NSString *)value
 {
-    dispatch_semaphore_signal(_semaphore);
+//    pthread_mutex_lock(&_mutex);
+    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
     NSString *SQLString = [NSString stringWithFormat:@"UPDATE CACHEINDEX SET value = '%@' WHERE key = '%@'",value,URL.absoluteString.md5];
     BOOL ret = sqlite3_exec(_db, SQLString.UTF8String, NULL, NULL, NULL) == SQLITE_OK;
-    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
+//    pthread_mutex_unlock(&_mutex);
+    dispatch_semaphore_signal(_semaphore);
+
     return ret;
 }
 
 - (BOOL)deleteDBWithKey:(NSString *)key
 {
-    dispatch_semaphore_signal(_semaphore);
+//    pthread_mutex_lock(&_mutex);
+    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
     NSString *SQLString = [NSString stringWithFormat:@"DELETE FROM CACHEINDEX WHERE key = '%@'",key];
     BOOL ret = sqlite3_exec(_db, SQLString.UTF8String, NULL, NULL, NULL) == SQLITE_OK;
-    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
+//    pthread_mutex_unlock(&_mutex);
+    dispatch_semaphore_signal(_semaphore);
+
     return  ret;
 }
 
@@ -126,7 +136,8 @@ NSString *const kValue = @"value";
 - (BOOL)initDB_
 {
     _dbPath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingPathComponent:kDBName];
-    _semaphore = dispatch_semaphore_create(0);
+//    pthread_mutex_init(&_mutex, NULL);
+    _semaphore = dispatch_semaphore_create(1);
     //打开数据库
     if ([self openDB]) {
         NSString *SQLString = @"CREATE TABLE IF NOT EXISTS CACHEINDEX(key text primary key,value text)";
